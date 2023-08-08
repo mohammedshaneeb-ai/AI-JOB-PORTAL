@@ -33,7 +33,9 @@ def update_job(request, job_id):
 
 def delete_job(request, job_id):
     job = get_object_or_404(Job, id=job_id)
+    print("outside working")
     if request.method == 'POST':
+        print("working")
         job.delete()
         return redirect('admin')  
     return render(request, 'admins/delete_job.html', {'job': job})
