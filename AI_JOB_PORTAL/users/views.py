@@ -43,9 +43,6 @@ def signin(request):
 
     return render(request, 'users/signin.html')
 
-def admin(request):
-    return render(request, 'users/admin.html')
-
 def user_logout(request):
     logout(request)
     messages.success(request, 'You have been logged out.')
