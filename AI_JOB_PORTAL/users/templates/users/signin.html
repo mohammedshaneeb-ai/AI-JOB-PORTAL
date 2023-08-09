@@ -28,7 +28,7 @@
           <div class="row button">
             <input type="submit" value="Login">
           </div>
-          <div class="signup-link">Not a member? <a href="#">Signup now</a></div>
+          <div class="signup-link">Not a member? <a href="{% url 'signup' %}">Signup now</a></div>
           {% if messages %}
             <ul class="messages">
                 {% for message in messages %}
