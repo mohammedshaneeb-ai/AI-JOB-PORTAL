@@ -1,5 +1,5 @@
 venv/
-training_Custom_NER/output
+training_Custom_NER/output/
 .env
 firebasecrediantials.json
 resumes/
