@@ -4,7 +4,7 @@ from django.db import models
 class Candidate(models.Model):
     name = models.CharField(max_length=100)
     place = models.CharField(max_length=100)
-    score = models.DecimalField(max_digits=5, decimal_places=2)
+    score = models.DecimalField(max_digits=5, decimal_places=1)
     domain = models.CharField(max_length=30)
     resume_link = models.URLField()
     email = models.EmailField()
