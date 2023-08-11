@@ -1,0 +1,365 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Document</title>
+    <style>
+        .error-message {
+            color: red;
+        }
+        /* Generic styles just to make this pen look better */
+        
+
+        /* ----- The actual thing ----- */
+
+        /* Variables */
+        .rating_body {
+            background: var(--background-color);
+            font: 16px/1 Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fill,
+                minmax(var(--rating-size), var(--rating-size))
+            );
+            gap: var(--bar-size);
+            justify-content: start;
+            padding: var(--bar-size);
+        }
+        
+        
+
+        :root {
+        --rating-size: 10rem;
+        --bar-size: 1rem;
+        --background-color: #e7f2fa;
+        --rating-color-default: #2980b9;
+        --rating-color-background: #c7e1f3;
+        --rating-color-good: #27ae60;
+        --rating-color-meh: #f1c40f;
+        --rating-color-bad: #e74c3c;
+        }
+
+        /* Rating item */
+        .rating {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 100%;
+        overflow: hidden;
+        
+        background: var(--rating-color-default);
+        color: var(--rating-color-default);
+        width: var(--rating-size);
+        height: var(--rating-size);
+
+        /* Basic style for the text */
+        font-size: calc(var(--rating-size) / 3);
+        line-height: 1;
+        }
+
+        /* Rating circle content */
+        .rating span {
+        position: relative;
+        display: flex;
+        font-weight: bold;
+        z-index: 2;
+        }
+
+        .rating span small {
+        font-size: 0.5em;
+        font-weight: 900;
+        align-self: center;
+        }
+
+        /* Bar mask, creates an inner circle with the same color as thee background */
+        .rating::after {
+        content: "";
+        position: absolute;
+        inset: var(--bar-size);
+        background: var(--background-color);
+        border-radius: inherit;
+        z-index: 1;
+        }
+
+        /* Bar background */
+        .rating::before {
+        content: "";
+        position: absolute;
+        inset: var(--bar-size);
+        border-radius: inherit;
+        box-shadow: 0 0 0 1rem var(--rating-color-background);
+        z-index: -1;
+        }
+
+        /* Classes to give different colors to ratings, based on their score */
+        .rating.good {
+        background: var(--rating-color-good);
+        color: var(--rating-color-good);
+        }
+
+        .rating.meh {
+        background: var(--rating-color-meh);
+        color: var(--rating-color-meh);
+        }
+
+        .rating.bad {
+        background: var(--rating-color-bad);
+        color: var(--rating-color-bad);
+        }
+        /* .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    } */
+    
+    .rating-background {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 100%;
+    }
+    
+    .rating-body {
+        width: 100px;
+        height: 100px;
+        border: 10px solid #e0e0e0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0 auto;
+        background-color: #f8f8f8;
+    }
+    
+    .rating-label {
+        margin-top: 10px;
+    }
+
+    </style>
+</head>
+<body>
+        <div class="wrapper">
+            <h1 class="mt-5">Magic is happend</h1>
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-md-2 ">
+                        <div class="rating-background">
+                            <h5>Your Score</h5>
+                            <div class="rating rating-body">{{details.score}}%</div>
+                            <div class="rating-label">
+                                <p>you need to improve your resume</p>
+                                <p>your resume have many problems </p>
+                            </div>
+                            <div class="rating_label">
+                                <p></p>
+                            </div>
+
+                        </div>
+                        
+
+                    </div>
+                    <div class="col-md-10">
+                        <form class="form__contact" id="contact-form" action="{% url 'edit_info' %}" method="post">
+                            {% csrf_token %}
+                            
+                          <fieldset>
+                            <p>Hey, Stranger!</p>
+                            <p>My name is <span class="form__field field--name" data-placeholder="your name"  tabindex="1" contenteditable name="name" >{{details.name}}</span><span class="error-message" id="name-error"></span> I'm from  <span class="form__field field--place" data-placeholder="your place" tabindex="2" contenteditable name="place">{{details.place}}</span>. <span class="error-message" id="place-error"></span></p>
+                            
+                            <p>I'm  <span class="form__field field--age" data-placeholder="your age " tabindex="3" contenteditable name="age" required pattern="[0-9]+" title="Please enter a valid number" ></span> <span class="error-message" id="age-error"></span> years old .</p>
+                            <p>I have  <span class="form__field field--experience" data-placeholder="your experience " tabindex="3" contenteditable name="experience" required pattern="[0-9]+"></span> <span class="error-message" id="experience-error"></span>  years experience. </p>
+                            <p>My email is  <span class="form__field field--email" data-placeholder="your email"  tabindex="1" contenteditable name="email" >{{details.email}}</span><span class="error-message" id="email-error"></span>
+                            <!-- <p>This is my email <span class="form__field field--email" data-placeholder="email address" tabindex="3" contenteditable name="email"  >{{details.email}} </span>. <span class="error-message" id="email-error"></span></p> -->
+                            <p>This is Phone is  <span class="form__field field--phone" data-placeholder="Your Phone No" tabindex="3" contenteditable name="phone"  >{{details.phone}} </span>. <span class="error-message" id="phone-error"></span></p>
+
+                            <!-- <p>This is my phone no : <span class="form__field field--phone" data-placeholder="phone number" tabindex="3" contenteditable name="phone" >{{details.phone}}</span>. <span class="error-message" id="phone-error"></span></p> -->
+                            <p>My education is <span class="form__field field--education" data-placeholder="education" tabindex="3" contenteditable name="education">{{details.education}}</span>. <span class="error-message" id="education-error"></span></p>
+                            <p>Hope to get in touch soon. Cheers!</p>
+                            <button type="submit" class="button button--xlarge" tabindex="4">Send message &#187;</button>
+                          </fieldset>
+                        </form>
+                      </div>
+                      
+                      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+                        <defs>
+                          <filter id="blur0">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0 0" />
+                          </filter>
+                          <filter id="blur1">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0 5" />
+                          </filter>
+                          <filter id="blur2">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0 10" />
+                          </filter>
+                          <filter id="blur3">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0 15" />
+                          </filter>
+                          <filter id="blur4">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0 20" />
+                          </filter>
+                        </defs>
+                      </svg>
+
+                    </div>
+                </div>
+            </div>
+            
+            
+
+          <script>
+            /*
+            Conic gradients are not supported in all browsers (https://caniuse.com/#feat=css-conic-gradients), so this pen includes the CSS conic-gradient() polyfill by Lea Verou (https://leaverou.github.io/conic-gradient/)
+            */
+
+            // Find al rating items
+            const ratings = document.querySelectorAll(".rating");
+
+            // Iterate over all rating items
+            ratings.forEach((rating) => {
+            // Get content and get score as an int
+            const ratingContent = rating.innerHTML;
+            const ratingScore = parseInt(ratingContent, 10);
+
+            // Define if the score is good, meh or bad according to its value
+            const scoreClass =
+                ratingScore < 40 ? "bad" : ratingScore < 60 ? "meh" : "good";
+
+            // Add score class to the rating
+            rating.classList.add(scoreClass);
+
+            // After adding the class, get its color
+            const ratingColor = window.getComputedStyle(rating).backgroundColor;
+
+            // Define the background gradient according to the score and color
+            const gradient = `background: conic-gradient(${ratingColor} ${ratingScore}%, transparent 0 100%)`;
+
+            // Set the gradient as the rating background
+            rating.setAttribute("style", gradient);
+
+            // Wrap the content in a tag to show it above the pseudo element that masks the bar
+            rating.innerHTML = `<span>${ratingScore} ${
+                ratingContent.indexOf("%") >= 0 ? "<small>%</small>" : ""
+            }</span>`;
+            });
+
+
+
+
+
+            document.addEventListener("DOMContentLoaded", function() {
+                const form = document.getElementById("contact-form");
+                const editableSpans = form.querySelectorAll(".form__field[contenteditable]");
+            
+                form.addEventListener("submit", function(event) {
+                    event.preventDefault();
+            
+                    const formData = new FormData(form);
+                    editableSpans.forEach(span => {
+                        const fieldName = span.getAttribute("name");
+                        const fieldValue = span.textContent.trim();
+                        formData.append(fieldName, fieldValue);
+                    });
+            
+                    const xhr = new XMLHttpRequest();
+                    xhr.open("POST", "{% url 'edit_info' %}", true);
+                    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            if (xhr.status === 200) {
+                                console.log("Data sent successfully!");
+                                // You can handle success behavior here
+                                window.location.href = '/';
+                            } else if (xhr.status === 400) {
+                                const response = JSON.parse(xhr.responseText);
+                                if (response.errors) {
+                                    const errorMessages = JSON.parse(response.errors);
+                                    Object.keys(errorMessages).forEach(fieldName => {
+                                        const span = form.querySelector(`[name="${fieldName}"]`);
+                                        const errorSpan = document.getElementById(`${fieldName}-error`);
+
+                                        if (errorSpan) {
+                                            const errorMessage = errorMessages[fieldName][0].message;
+                                            errorSpan.textContent = errorMessage;
+                                           // errorSpan.textContent = errorMessages[fieldName][0]; // Display the first error message
+                                            
+                                        }
+                                    });
+                                } else {
+                                    console.error("Failed to send data.");
+                                }
+                            }
+                        }
+                    };
+                    xhr.send(formData);
+                });
+            });
+            document.addEventListener("DOMContentLoaded", function() {
+                const numericFields = document.querySelectorAll(".field--age[contenteditable], .field--experience[contenteditable]");
+
+                numericFields.forEach(field => {
+                    field.addEventListener("input", function() {
+                        const caretPosition = getCaretPosition(this);
+                        const currentValue = this.textContent;
+                        const numericValue = filterNumericInput(currentValue);
+                        this.textContent = numericValue;
+                        setCaretPosition(this, caretPosition);
+                    });
+                });
+
+                function filterNumericInput(input) {
+                    return input.replace(/[^\d.]/g, "");
+                }
+
+
+                function getCaretPosition(element) {
+                    const selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        const range = selection.getRangeAt(0);
+                        return range.endOffset;
+                    }
+                    return 0;
+                }
+
+                function setCaretPosition(element, position) {
+                    const range = document.createRange();
+                    const selection = window.getSelection();
+                    range.setStart(element.childNodes[0], Math.min(position, element.textContent.length));
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            });
+
+
+
+            const scoreCircle = document.querySelector('.score-circle');
+
+            // Set the initial score
+            let score = 90;
+
+            // Function to update the score circle
+            function updateScore() {
+                const scoreNumber = scoreCircle.querySelector('.score-number');
+                scoreNumber.textContent = score;
+            }
+
+            // Call the updateScore function to set the initial score
+            updateScore();
+
+            </script>
+            
+            
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "users",
     "admins",
     "home",
+    "sass",
 ]
 
 MIDDLEWARE = [

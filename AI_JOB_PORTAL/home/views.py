@@ -18,6 +18,12 @@ import spacy
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from urllib.parse import quote
+from django.views.decorators.csrf import csrf_protect
+from .forms import ContactForm
+import json
+from django.http import JsonResponse
+from .models import Candidate
 # Create your views here.
 
 cred = credentials.Certificate("/home/mohammed_shaneeb/Desktop/AI-JOB-PORTAL/firebasecrediantials.json")
@@ -188,6 +194,13 @@ def submit_job(request,job_id):
         phone = get_phone(doc_resume)
         education = get_education(doc_resume)
 
+        request.session['nm'] = name
+        request.session['em'] = email
+        request.session['pl'] = place
+        request.session['ph'] = phone
+        request.session['ed'] = education
+        request.session['resume'] = short_url
+        request.session['domain'] = domain
 
         print(resume_skills)
         print(job_skills)
@@ -195,13 +208,89 @@ def submit_job(request,job_id):
 
 
         resume_score = similarity_score(resume_skills,job_skills)
-        resume_score = round((((resume_score + 1) / 2) * 9 + 1),1)
-
+        print("resume score before :",resume_score)
+        resume_score = (resume_score + 1) * 50
+        
+        # resume_score = round((((resume_score + 1) / 2) * 9 + 1),1)
+        request.session['sr'] = resume_score
         print(resume_score)
 
         #resume_skills converting to comma seperated string to save in mysql database
         resume_skills  = ','.join(map(str, resume_skills))
+        request.session['skills'] = resume_skills
+        
 
+
+        return redirect('edit_info')
        
 
     return render(request,'home/submit_job.html',{'job':job})
+
+@csrf_protect
+def edit_info(request):
+    name = request.session.get('nm')
+    email = request.session.get('em')
+    place = request.session.get('pl')
+    phone = request.session.get('ph')
+    education = request.session.get('ed')
+    score = request.session.get('sr')
+    skills = request.session.get('skills')
+    resume_link = request.session.get('resume')
+    domain = request.session.get('domain')
+
+    print("score is :",score)
+    print("new name is ::",name)
+    print("skills :",skills)
+    details ={
+        'name' : name,
+        'email' : email,
+        'place' : place,
+        'phone' : phone,
+        'education':education,
+        'score':score
+    }
+    score = round(score,1)
+    print("score after round",score)
+
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+
+        print(request.POST)
+        if form.is_valid():
+            name = request.POST.get('name')
+            email = request.POST.get('email')
+            phone = request.POST.get('phone')
+            place = request.POST.get('place')
+            education = request.POST.get('education')
+            experience = request.POST.get('experience')
+            age = request.POST.get('age')
+            
+
+            applicant = Candidate(
+            name=name,
+            place=place,
+            resume_link=resume_link,
+            email=email,
+            phone=phone,
+            education=education,
+            skills=skills,
+            age = age,
+            experience = experience,
+            score = score,
+            domain = domain
+            )
+            applicant.save()
+
+            print(name,age,experience,email,phone,place,education)
+            # return redirect('/')
+            
+        else:
+            errors = form.errors.as_json()
+            print("working errorrrrrrrrrrrr")
+            return JsonResponse({"errors": errors}, status=400)
+        
+
+    return render(request,'home/edit_information.html',{'details':details})
+
+def success(request):
+    return render(request,'home/success.html')
