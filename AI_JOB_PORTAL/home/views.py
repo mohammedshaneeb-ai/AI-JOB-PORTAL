@@ -208,16 +208,18 @@ def submit_job(request,job_id):
 
 
         resume_score = similarity_score(resume_skills,job_skills)
+        resume_score_10 = round((((resume_score + 1) / 2) * 9 + 1),1)
         print("resume score before :",resume_score)
         resume_score = (resume_score + 1) * 50
         
-        # resume_score = round((((resume_score + 1) / 2) * 9 + 1),1)
+        
         request.session['sr'] = resume_score
         print(resume_score)
 
         #resume_skills converting to comma seperated string to save in mysql database
         resume_skills  = ','.join(map(str, resume_skills))
         request.session['skills'] = resume_skills
+        request.session['score_10'] = resume_score_10
         
 
 
@@ -237,6 +239,7 @@ def edit_info(request):
     skills = request.session.get('skills')
     resume_link = request.session.get('resume')
     domain = request.session.get('domain')
+    score_10 = request.session.get('score_10')
 
     print("score is :",score)
     print("new name is ::",name)
@@ -276,7 +279,7 @@ def edit_info(request):
             skills=skills,
             age = age,
             experience = experience,
-            score = score,
+            score = score_10,
             domain = domain
             )
             applicant.save()
