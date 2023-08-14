@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "admins",
     "home",
     "sass",
+    "chat",
 ]
 
 MIDDLEWARE = [
