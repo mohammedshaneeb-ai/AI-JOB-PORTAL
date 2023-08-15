@@ -88,7 +88,7 @@ def submit_job(request,job_id):
         blob = bucket.blob(pdf_file.name)
         blob.upload_from_file(pdf_file)
 
-        expiration = datetime.utcnow() + timedelta(days=30)
+        expiration = datetime.utcnow() + timedelta(days=365)
 
         # Get the download URL (link) of the uploaded file
         download_url = blob.generate_signed_url(expiration)

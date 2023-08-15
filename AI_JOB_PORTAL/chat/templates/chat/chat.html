@@ -12,12 +12,18 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<link rel="stylesheet" href="{% static 'chat/style.css' %}">
 	</head>
+	<style>
+		#buffering {
+			visibility: hidden;
+		}
+	</style>
+	
 	
 	
 	<body>
 		<div class="container-fluid h-100">
 			<div class="row justify-content-center h-100">		
-				<div class="col-md-8 col-xl-6 chat">
+				<div class="col-md-12 col-xl-12 chat m-5">
 					<div class="card">
 						<div class="card-header msg_head">
 							<div class="d-flex bd-highlight">
@@ -34,6 +40,13 @@
 						<div id="messageFormeight" class="card-body msg_card_body">
 							
 							
+							
+						</div>
+						<div id="buffering" class="d-flex justify-content-start mb-4 align-items-center">
+							<div class="spinner-border text-secondary" role="status">
+								<span class="sr-only">Loading...</span>
+							</div>
+							<span class="msg_cotainer">Searching for an answer...</span>
 						</div>
 						<div class="card-footer">
 							<form id="messageArea" class="input-group">
@@ -52,6 +65,7 @@
 			$(document).ready(function() {
 				const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 				$("#messageArea").on("submit", function(event) {
+					
 					const date = new Date();
 					const hour = date.getHours();
 					const minute = date.getMinutes();
@@ -62,18 +76,38 @@
 					
 					$("#text").val("");
 					$("#messageFormeight").append(userHtml);
+					document.getElementById("buffering").style.visibility = "visible";
 
 					$.ajax({
 						data: {
-							msg: rawText,	
+							msg: rawText,
 							csrfmiddlewaretoken: csrftoken,
 						},
 						type: "POST",
 						url: "{% url 'chat' %}",
 					}).done(function(data) {
-						var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://i.ibb.co/fSNP7Rz/icons8-chatgpt-512.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span></div></div>';
-						$("#messageFormeight").append($.parseHTML(botHtml));
+						document.getElementById("buffering").style.visibility = "hidden";
+						if (typeof data.response === 'string') {
+							// Append string response
+							var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://i.ibb.co/fSNP7Rz/icons8-chatgpt-512.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer" > ' + data.response + '<span class="msg_time">' + str_time + '</span></div></div>';
+							$("#messageFormeight").append($.parseHTML(botHtml));
+						} else if (typeof data.response === 'string' && data.response.startsWith('<table')) {
+							// Append Pandas dataframe (HTML table)
+							$("#messageFormeight").append(data.response);
+						} else if (typeof data.response === 'string' && data.response.startsWith('<img')) {
+							// Append Matplotlib image (HTML img tag)
+							$("#messageFormeight").append(data.response);
+						}else if (typeof data.response === 'string' && data.response.startsWith('<a href="data:application/zip;base64,')) {
+        					// Append Download All Resumes as Zip link
+        					$("#messageFormeight").append(data.response);
+    					}
+						 else {
+							// Handle other response types here
+							console.log("Unsupported response type:", data.response);
+						}
 					});
+					
+
 					event.preventDefault();
 				});
 			});
